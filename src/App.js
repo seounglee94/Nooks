@@ -1,34 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
 
-const useFullscreen = (callback) => {
-  const element = useRef();
-  const triggerFull = () => {
-    if (element.current) {
-      element.current.requestFullScreen();
-      if (callback && typeof callback === "function") {
-        callback(true);
+const useNotification = (title, options) => {
+  if (!("Notification" in window)) {
+    return;
+  }
+  const fireNotif = () => {};
+  if (Notification.permission !== "granted") {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        new Notification(title, options);
+      } else {
+        return;
       }
-    }
-  };
-  const exitFull = () => {
-    document.exitFullscreen();
-  };
-  return { element, triggerFull };
+    });
+  } else {
+    new Notification(title, options);
+  }
+  return fireNotif;
 };
 
 export default function App() {
-  const onFullS = (isFull) => {
-    console.log(isFull ? "We are full" : "We are small");
-  };
-  const { element, triggerFull, exitFull } = useFullscreen();
+  const triggerNotif = useNotification("Can I steal your kimchi", {
+    body: "I love kimchi dont you",
+  });
   return (
     <div className="App" style={{ height: "1000vh" }}>
-      <div ref={element}>
-        <img src="https://i.ibb.co/R6RwNxx/grape.jpg" alt="grape" width="250" />
-        <button onClick={exitFull}>Exit fullscreen </button>
-      </div>
-      <button onClick={triggerFull}>Make fullscreen </button>
+      <button onClick={triggerNotif}>Hello</button>
     </div>
   );
 }
